@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Translator | AI-Powered Speed</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================
+           RESET & VARIABLES
+           ============================ */
+        :root {
+            --bg-void: #050505;
+            --glass-bg: rgba(26, 26, 26, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-silver: #E0E0E0;
+            --text-dim: #A0A0A0;
+            --neon-cyan: #00E5FF;
+            --neon-purple: #D500F9;
+            --font-display: 'Rajdhani', sans-serif;
+            --font-body: 'Poppins', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-void);
+            color: var(--text-silver);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ============================
+           ANIMATED BACKGROUND
+           ============================ */
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 200vw;
+            height: 200vh;
+            background-image: 
+                linear-gradient(var(--glass-border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--glass-border) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: 0 0;
+            transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+            opacity: 0.2;
+            animation: gridMove 20s linear infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .orb-glow {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(213, 0, 249, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            animation: pulseGlow 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(50px) translateZ(-200px); }
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        /* ============================
+           HEADER
+           ============================ */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 5%;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-text {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ============================
+           HERO SECTION (Parallax)
+           ============================ */
+        .hero {
+            height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop'); 
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+            border-bottom: 2px solid var(--neon-cyan);
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 5, 0.75); /* Dark overlay */
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(0, 229, 255, 0.6);
+            margin-bottom: 0.5rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--neon-cyan);
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        /* ============================
+           TRANSLATOR COMPONENT
+           ============================ */
+        .container {
+            max-width: 1200px;
+            margin: -50px auto 4rem auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .translator-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 2px var(--neon-cyan);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        select {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-silver);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s all;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+        }
+
+        option {
+            background: #1a1a1a;
+            color: var(--text-silver);
+        }
+
+        .swap-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--neon-purple);
+            color: var(--neon-purple);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s ease;
+        }
+
+        .swap-btn:hover {
+            background: var(--neon-purple);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(213, 0, 249, 0.6);
+            transform: rotate(180deg);
+        }
+
+        .translation-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            position: relative;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: #fff;
+            font-family: var(--font-body);
+            font-size: 1.1rem;
+            resize: none;
+            transition: 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--neon-purple);
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 15px rgba(213, 0, 249, 0.1);
+        }
+
+        textarea::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+
+        /* Decorative line between textareas (Visual only for desktop) */
+        .translation-area::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 20px;
+            bottom: 20px;
+            width: 1px;
+            background: linear-gradient(transparent, var(--glass-border), transparent);
+        }
+
+        .char-count {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            pointer-events: none;
+        }
+
+        /* ============================
+           FOOTER & RESPONSIVE
+           ============================ */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            border-top: 1px solid var(--glass-border);
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .translation-area { grid-template-columns: 1fr; gap: 1rem; }
+            .translation-area::after { display: none; }
+            .swap-btn { transform: rotate(90deg); }
+            .swap-btn:hover { transform: rotate(270deg); }
+        }
+
+        /* Status Toast */
+        #status-msg {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            height: 1.5em;
+        }
+        .error-msg { color: #ff5252; }
+        .translating-msg { color: var(--neon-cyan); }
+
+    </style>
+</head>
+<body>
+
+    <div class="cyber-grid"></div>
+    <div class="orb-glow"></div>
+
+    <!-- Header -->
+    <header>
+        <div class="logo-area">
+            <!-- Custom Tech Icon SVG -->
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#00E5FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="#D500F9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="#E0E0E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div class="logo-text">Super Translator</div>
+        </div>
+        <div style="font-family: var(--font-display); color: var(--text-dim);">V 3.0</div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>NEURAL LINK</h1>
+            <p>Breaking Language Barriers with AI Speed</p>
+        </div>
+    </section>
+
+    <!-- Main App Container -->
+    <main class="container">
+        <div class="translator-card">
+            
+            <div class="controls">
+                <select id="source-lang"></select>
+                
+                <button id="swap" class="swap-btn" title="Swap Languages">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M7 16V4M7 4L3 8M7 4L11 8M17 8v12M17 20l4-4M17 20l-4-4"/>
+                    </svg>
+                </button>
+                
+                <select id="target-lang"></select>
+            </div>
+
+            <div class="translation-area">
+                <div class="input-group">
+                    <textarea id="source-text" placeholder="Enter text or paste data..."></textarea>
+                    <div id="status-msg"></div>
+                </div>
+                
+                <div class="input-group">
+                    <textarea id="target-text" readonly placeholder="Translation appears here..."></textarea>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2025 Super Translator. Future Interface Design.
+    </footer>
+
+    <!-- JS Logic -->
+    <script>
+        // 1. Language Data Dictionary
+        const languages = {
+            'bn': 'Bengali',
+            'hi': 'Hindi',
+            'en': 'English',
+            'ur': 'Urdu',
+            'af': 'Afrikaans', 'sq': 'Albanian', 'ar': 'Arabic', 'hy': 'Armenian',
+            'az': 'Azerbaijani', 'eu': 'Basque', 'be': 'Belarusian',
+            'bg': 'Bulgarian', 'ca': 'Catalan', 'zh-CN': 'Chinese (Simp)', 'zh-TW': 'Chinese (Trad)',
+            'hr': 'Croatian', 'cs': 'Czech', 'da': 'Danish', 'nl': 'Dutch',
+            'eo': 'Esperanto', 'et': 'Estonian', 'tl': 'Filipino', 'fi': 'Finnish',
+            'fr': 'French', 'gl': 'Galician', 'ka': 'Georgian', 'de': 'German',
+            'el': 'Greek', 'gu': 'Gujarati', 'ht': 'Haitian Creole', 'iw': 'Hebrew',
+            'hu': 'Hungarian', 'is': 'Icelandic', 'id': 'Indonesian', 'ga': 'Irish',
+            'it': 'Italian', 'ja': 'Japanese', 'kn': 'Kannada', 'ko': 'Korean',
+            'la': 'Latin', 'lv': 'Latvian', 'lt': 'Lithuanian', 'mk': 'Macedonian',
+            'ms': 'Malay', 'mt': 'Maltese', 'no': 'Norwegian', 'fa': 'Persian',
+            'pl': 'Polish', 'pt': 'Portuguese', 'ro': 'Romanian', 'ru': 'Russian',
+            'sr': 'Serbian', 'sk': 'Slovak', 'sl': 'Slovenian', 'es': 'Spanish',
+            'sw': 'Swahili', 'sv': 'Swedish', 'ta': 'Tamil', 'te': 'Telugu',
+            'th': 'Thai', 'tr': 'Turkish', 'uk': 'Ukrainian', 'vi': 'Vietnamese',
+            'cy': 'Welsh', 'yi': 'Yiddish'
+        };
+
+        const selectSource = document.querySelector("#source-lang");
+        const selectTarget = document.querySelector("#target-lang");
+        const sourceText = document.querySelector("#source-text");
+        const targetText = document.querySelector("#target-text");
+        const swapBtn = document.querySelector("#swap");
+        const statusMsg = document.querySelector("#status-msg");
+
+        // 2. Logic to Sort Languages based on Rule
+        function getSortedLanguageKeys() {
+            const priorities = ['bn', 'hi', 'en', 'ur'];
+            // Filter out priorities, get rest keys
+            const rest = Object.keys(languages).filter(code => !priorities.includes(code));
+            // Sort rest Alphabetically by Language Name (not code)
+            rest.sort((a, b) => languages[a].localeCompare(languages[b]));
+            
+            return [...priorities, ...rest];
+        }
+
+        // 3. Populate Select Options
+        function populateLanguages() {
+            const sortedKeys = getSortedLanguageKeys();
+
+            // Source (With Auto)
+            let srcOptions = `<option value="auto">Auto Detect</option>`;
+            // Target (No Auto)
+            let trgOptions = ``;
+
+            sortedKeys.forEach(code => {
+                const name = languages[code];
+                // Mark priority ones strictly for UI (optional visuals) or keep logic strict
+                const isPriority = ['bn', 'hi', 'en', 'ur'].includes(code);
+                
+                // Helper to create option
+                const optionTag = `<option value="${code}">${name}</option>`;
+                
+                srcOptions += optionTag;
+                trgOptions += optionTag;
+            });
+
+            selectSource.innerHTML = srcOptions;
+            selectTarget.innerHTML = trgOptions;
+
+            // Set defaults (e.g., Source: Auto, Target: Bengali - priority 1)
+            selectSource.value = "auto";
+            selectTarget.value = "bn"; 
+        }
+
+        populateLanguages();
+
+        // 4. API & Debounce Logic
+        let timer;
+        const debounceDelay = 500; // 500ms
+
+        function translateText() {
+            const text = sourceText.value.trim();
+            const sourceLang = selectSource.value;
+            const targetLang = selectTarget.value;
+
+            // Clear invalid scenarios
+            if (!text) {
+                targetText.value = "";
+                statusMsg.innerText = "";
+                return;
+            }
+
+            statusMsg.className = 'translating-msg';
+            statusMsg.innerText = "Processing via Neural Net...";
+
+            // Use encodeURIComponent to handle special characters properly
+            const apiUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    // CRITICAL PARSING LOGIC
+                    // data[0] is an array of segments: [["Translated sentence", "Original", null, null], [...]]
+                    // We must map and join them to get the full paragraph.
+                    if(data && data[0]) {
+                        const translatedCombined = data[0].map(segment => segment[0]).join('');
+                        targetText.value = translatedCombined;
+                        statusMsg.innerText = "";
+                    }
+                })
+                .catch(err => {
+                    console.error("Fetch Error: ", err);
+                    targetText.value = "";
+                    statusMsg.className = 'error-msg';
+                    statusMsg.innerText = "Network Error: Link severed.";
+                });
+        }
+
+        // Wrapper with Debounce
+        sourceText.addEventListener("input", () => {
+            clearTimeout(timer);
+            timer = setTimeout(translateText, debounceDelay);
+        });
+
+        // Trigger on language change
+        selectSource.addEventListener("change", translateText);
+        selectTarget.addEventListener("change", translateText);
+
+        // 5. Swap Logic
+        swapBtn.addEventListener("click", () => {
+            const tempSource = selectSource.value;
+            const tempTarget = selectTarget.value;
+
+            // If source is auto, we cannot assume what the "source" truly is easily to put into target without complex detection
+            // Simple Logic: if source is auto, defaulting to swapping "auto" to target is invalid.
+            // Adjust: if Auto, specific behavior: Set source to previous target, set target to english (fallback) or ignore.
+            
+            if (tempSource === 'auto') {
+                statusMsg.className = 'error-msg';
+                statusMsg.innerText = "Cannot swap 'Auto Detect'";
+                setTimeout(() => statusMsg.innerText = "", 2000);
+                return;
+            }
+
+            // Normal Swap
+            selectSource.value = tempTarget;
+            selectTarget.value = tempSource;
+
+            // Also swap text if present
+            const tempText = sourceText.value;
+            sourceText.value = targetText.value;
+            targetText.value = tempText;
+
+            // Trigger translation again with new values
+            translateText();
+        });
+
+    </script>
+</body>
+</html>
